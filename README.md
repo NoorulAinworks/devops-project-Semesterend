@@ -9,6 +9,7 @@ Semester project for DevOps Principles and Practices (2+1), BS Computer Science,
 | Noor Ul Ain | 23-NTU-CS-FL-1221 | NoorulAinworks |
 | Alishba Riasat | 23-NTU-CS-FL-1135 |Alishba-Alvi |
 | Hafsa Tayyab | 23-NTU-CS-FL-1163 | Hafsa-Tayyab |
+| Afia Maham | 23-NTU-CS-FL-1126 | AfiaMaham |
 
 ## Review turnaround
 
