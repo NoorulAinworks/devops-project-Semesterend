@@ -24,3 +24,11 @@ WhatsApp group.
 - `main` is protected: no direct pushes, every change goes through a pull request.
 - Each pull request needs 1 approval and all conversations resolved before merging.
 - Branches are named after the issue or task, for example `fix/3-short-description`.
+
+## devops-pipeline package
+
+Renders Markdown sources into HTML pages.
+
+    npx devops-build input.md output.html
+
+Requires Node.js 20 or newer.
