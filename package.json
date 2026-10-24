@@ -1,6 +1,6 @@
 {
   "name": "@noorulainworks/devops-pipeline",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Renders the course Markdown sources into HTML pages.",
   "main": "tools/build.js",
   "bin": {
