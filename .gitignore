@@ -6,3 +6,6 @@ out/
 .DS_Store
 node_modules/
 *.tgz
+node_modules/
+out/
+*.tgz
