@@ -24,3 +24,9 @@ test('no page is empty', () => {
     assert.ok(size > 0, p + ' is empty (zero bytes)');
   }
 });
+
+test('every page names the course', () => {
+  for (const p of pages) {
+    assert.match(fs.readFileSync('out/' + p, 'utf8'), /DevOps/);
+  }
+});
