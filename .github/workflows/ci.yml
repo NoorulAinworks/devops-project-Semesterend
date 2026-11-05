@@ -1,3 +1,4 @@
+# CI workflow for Lab 06 (Hafsa)
 name: CI
 
 on:
