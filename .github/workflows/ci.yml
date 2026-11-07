@@ -3,34 +3,43 @@ name: CI
 
 on:
   push:
-    branches: [main]
-  pull_request:
+    branches: [main]   # runs when a commit lands on main
+  pull_request:        # runs when a PR is opened or updated (this becomes the gate)
   schedule:
-    - cron: '0 2 * * *'
+    - cron: '0 2 * * *'   # nightly at 02:00 UTC, only the audit job uses this
+
+permissions:
+  contents: read   # token is read-only; nothing in this lab needs write access
+
+concurrency:
+  group: ci-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}   # newer PR push cancels the older run
 
 jobs:
   build:
-    name: build-and-test
-    runs-on: ubuntu-24.04
+    name: build-and-test   # also the name of the required status check
+    runs-on: ubuntu-24.04  # clean agent, created for this run and destroyed after
+    timeout-minutes: 10    # fail a hung build instead of burning minutes
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4   # clone the repo onto the agent
 
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: npm
+          cache: npm   # cache downloaded dependencies, keyed on package-lock.json
       - name: Build, test and package
-        run: make ci
+        run: make ci   # the Makefile target from Lab 02, unchanged
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: devops-pipeline
           path: '*.tgz'
-          if-no-files-found: error
+          if-no-files-found: error   # fail instead of silently uploading nothing
   audit:
     name: dependency-audit
     runs-on: ubuntu-24.04
-    if: github.event_name == 'schedule'
+    timeout-minutes: 10
+    if: github.event_name == 'schedule'   # keeps the slow audit off every PR
     steps:
       - uses: actions/checkout@v4
 
