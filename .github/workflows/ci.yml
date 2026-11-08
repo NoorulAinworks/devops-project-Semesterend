@@ -1,45 +1,83 @@
+
 # CI workflow for Lab 06 (Hafsa)
 name: CI
 
 on:
   push:
-    branches: [main]   # runs when a commit lands on main
-  pull_request:        # runs when a PR is opened or updated (this becomes the gate)
+    branches: [main]
+  pull_request:
   schedule:
-    - cron: '0 2 * * *'   # nightly at 02:00 UTC, only the audit job uses this
+    - cron: '0 2 * * *'
 
 permissions:
-  contents: read   # token is read-only; nothing in this lab needs write access
+  contents: read
 
 concurrency:
   group: ci-${{ github.event_name }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}   # newer PR push cancels the older run
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  build:
-    name: build-and-test   # also the name of the required status check
-    runs-on: ubuntu-24.04  # clean agent, created for this run and destroyed after
-    timeout-minutes: 10    # fail a hung build instead of burning minutes
+  lint:
+    name: lint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4   # clone the repo onto the agent
+      - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: npm   # cache downloaded dependencies, keyed on package-lock.json
-      - name: Build, test and package
-        run: make ci   # the Makefile target from Lab 02, unchanged
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+          cache: npm
+
+      - run: make lint
+
+  test:
+    name: test
+    needs: lint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: make coverage
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/lcov.info
+          if-no-files-found: error
+
+  package:
+    name: package
+    needs: test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: make package
+
+      - uses: actions/upload-artifact@v4
         with:
           name: devops-pipeline
           path: '*.tgz'
-          if-no-files-found: error   # fail instead of silently uploading nothing
+          if-no-files-found: error
+
   audit:
     name: dependency-audit
     runs-on: ubuntu-24.04
     timeout-minutes: 10
-    if: github.event_name == 'schedule'   # keeps the slow audit off every PR
+    if: github.event_name == 'schedule'
     steps:
       - uses: actions/checkout@v4
 
@@ -51,3 +89,4 @@ jobs:
       - run: npm ci
 
       - run: npm audit --audit-level=high
+
