@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // tools/build.js — renders one Markdown source into one HTML page.
 // Called by the Makefile: npm run build -- src/notes.md out/notes.html
+const unusedLimit = 100;
 const fs = require('fs');
 const path = require('path');
 const MarkdownIt = require('markdown-it');
