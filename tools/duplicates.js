@@ -5,4 +5,5 @@ function isDuplicate(pageA, pageB) {
   }
   return pageA.title === pageB.title;
 }
+
 module.exports = { isDuplicate };
